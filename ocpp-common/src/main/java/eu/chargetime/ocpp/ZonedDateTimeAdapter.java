@@ -1,6 +1,7 @@
 package eu.chargetime.ocpp;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /*
@@ -31,6 +32,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class ZonedDateTimeAdapter extends XmlAdapter<String, ZonedDateTime> {
 
+  private static final DateTimeFormatter rigidDateTimeFormatter =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
   @Override
   public ZonedDateTime unmarshal(String string) throws Exception {
     return ZonedDateTime.parse(string);
@@ -38,6 +42,6 @@ public class ZonedDateTimeAdapter extends XmlAdapter<String, ZonedDateTime> {
 
   @Override
   public String marshal(ZonedDateTime zonedDateTime) throws Exception {
-    return zonedDateTime.toString();
+    return zonedDateTime.format(rigidDateTimeFormatter);
   }
 }

@@ -7,6 +7,7 @@ import eu.chargetime.ocpp.model.CallResultMessage;
 import eu.chargetime.ocpp.model.Message;
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +62,9 @@ public class JSONCommunicator extends Communicator {
   private static final String CALL_FORMAT = "[2,\"%s\",\"%s\",%s]";
   private static final String CALLRESULT_FORMAT = "[3,\"%s\",%s]";
   private static final String CALLERROR_FORMAT = "[4,\"%s\",\"%s\",\"%s\",%s]";
-  private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-  private static final String DATE_FORMAT_WITH_MS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-  private static final int DATE_FORMAT_WITH_MS_LENGTH = 24;
 
-  private boolean hasLongDateFormat = false;
+  private static final DateTimeFormatter rigidDateTimeFormatter =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
   /**
    * Handle required injections.
@@ -76,16 +75,16 @@ public class JSONCommunicator extends Communicator {
     super(radio);
   }
 
-  private class ZonedDateTimeSerializer implements JsonSerializer<ZonedDateTime> {
+  private static class ZonedDateTimeSerializer implements JsonSerializer<ZonedDateTime> {
 
     @Override
     public JsonElement serialize(
         ZonedDateTime zonedDateTime, Type type, JsonSerializationContext jsonSerializationContext) {
-      return new JsonPrimitive(zonedDateTime.toString());
+      return new JsonPrimitive(zonedDateTime.format(rigidDateTimeFormatter));
     }
   }
 
-  public class ZonedDateTimeDeserializer implements JsonDeserializer<ZonedDateTime> {
+  private static class ZonedDateTimeDeserializer implements JsonDeserializer<ZonedDateTime> {
 
     @Override
     public ZonedDateTime deserialize(
